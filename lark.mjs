@@ -29,8 +29,7 @@ export async function sync(record) {
           size,
           file,
         },
-      },
-      lark.withUserAccessToken(process.env.appAccessToken)
+      }
     );
     attachment.push(result)
     await sleep(1);
@@ -57,7 +56,6 @@ export async function sync(record) {
         },
       },
       path: { app_token: process.env.appToken, table_id: process.env.tableId },
-    },
-    lark.withUserAccessToken(process.env.appAccessToken)
+    }
   );
 }

@@ -79,10 +79,10 @@ while(links.length > 0) {
   const section = $(".Section__tableData");
   const id = section.eq(12).text().trim();
 
-  const title = $(".ProductTitle__text").eq(0).text();
+  const title = $(".ProductTitle__text").eq(0).text().trim();
   const nameMatch = title.match(/C\.?[0-9a-z-.()/''‘’ ]+/i);
   const speciesMatch = title.match(/C\.?\s?[a-z]+/i);
-  const individualMatch = title.match(/['‘’]([a-z. ]+)['’]?/i);
+  const individualMatch = title.match(/['`‘’´]([a-z. ]+)['’｀]?/i);
   const timesMatch = $(".Count__detail").eq(0).text().match(/(\d+)/);
 
   const images = new Set();
@@ -94,12 +94,12 @@ while(links.length > 0) {
     id,
     link,
     title,
-    name: nameMatch ? nameMatch[0] : "",
-    species: speciesMatch ? speciesMatch[0] : "",
+    name: nameMatch ? nameMatch[0].trim() : "",
+    species: speciesMatch ? speciesMatch[0].trim() : "",
     individual: /\s?[xX]\s+/.test(title)
       ? ""
       : individualMatch
-      ? individualMatch[1]
+      ? individualMatch[1].trim()
       : "",
     description: $(".ProductExplanation__commentBody")
       .text()
