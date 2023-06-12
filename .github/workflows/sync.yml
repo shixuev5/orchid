@@ -8,17 +8,17 @@ on:
 jobs:
   sync:
     runs-on: ubuntu-latest
+    env:
+      noProxy: true
+      appId: ${{ secrets.APPID }}
+      appSecret: ${{ secrets.APPSECRET }}
+      appToken: ${{ secrets.APPTOKEN }}
+      tableId: ${{ secrets.TABLEID }}
     steps:
       - uses: actions/checkout@main
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-        env:
-          appId: ${{ secrets.APPID }}
-          appSecret: ${{ secrets.APPSECRET }}
-          appToken: ${{ secrets.APPTOKEN }}
-          tableId: ${{ secrets.TABLEID }}
-          noProxy: true
       - name: Install dependencies
         run: |
           yarn
