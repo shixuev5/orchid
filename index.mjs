@@ -1,16 +1,16 @@
-import "dotenv/config";
 import { load } from "cheerio";
 import fs from "fs";
 import { http } from "./http.mjs";
 import { sync } from "./lark.mjs";
 
+const configFile = '.config';
 let cursor = 1;
 let total = Infinity;
 let latestID = 0;
 const links = [];
 
-if (fs.existsSync(process.env.configFile)) {
-  latestID = fs.readFileSync(process.env.configFile, "utf-8");
+if (fs.existsSync(configFile)) {
+  latestID = fs.readFileSync(configFile, "utf-8");
 }
 
 const fetchList = async (cursor) => {
@@ -133,7 +133,7 @@ while(links.length > 0) {
 
   await sync(record);
 
-  fs.writeFileSync(process.env.configFile, String(id));
+  fs.writeFileSync(configFile, String(id));
 }
 
 console.log();
