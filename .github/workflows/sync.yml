@@ -9,7 +9,6 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     env:
-      noProxy: true
       appId: ${{ secrets.APPID }}
       appSecret: ${{ secrets.APPSECRET }}
       appToken: ${{ secrets.APPTOKEN }}
@@ -34,5 +33,5 @@ jobs:
       - name: Push changes
         uses: ad-m/github-push-action@master
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.ACCESS_TOKEN }}
         
