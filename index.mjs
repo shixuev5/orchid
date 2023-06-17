@@ -33,6 +33,24 @@ const fetchList = async (cursor) => {
   return load(response.data);
 };
 
+// 返回 C. xxx
+function normalizeGenera(str) {
+  return str.replace(/^([CcPpLl])\.?\s*(.+)$/, (_, $1, $2) => `${$1.toUpperCase()}. ${$2}`);
+}
+
+// 判断属名
+function judgeGenera(str) {
+  let genera = ''
+  if (str.startsWith('C')) {
+    genera = 'Cattleya'
+  } else if (str.startsWith('L')) {
+    genera = 'Laelia'
+  } else if (str.startsWith('P')) {
+    genera = 'Phalaenopsis'
+  }
+  return genera;
+}
+
 while (cursor < total) {
   const $ = await fetchList(cursor);
 
@@ -90,22 +108,25 @@ while(links.length > 0) {
     images.add($(this).attr("src"));
   });
 
+  const species = normalizeGenera(speciesMatch ? speciesMatch[0].trim() : "");
+
   const record = {
     id,
-    link,
-    title,
-    name: nameMatch ? nameMatch[0].trim() : "",
-    species: speciesMatch ? speciesMatch[0].trim() : "",
+    genera: judgeGenera(species),
+    species,
     individual: /\s?[xX]\s+/.test(title)
       ? ""
       : individualMatch
       ? individualMatch[1].trim()
       : "",
+    name: nameMatch ? nameMatch[0].trim() : "",
+    title,
     description: $(".ProductExplanation__commentBody")
       .text()
       .trim()
       .replace(/^\n/, "")
       .replace(/\n$/, ""),
+    link,
     startPrice: Number(
       section.eq(9).text().replace(/円.*/, "").replace(",", "").trim()
     ),

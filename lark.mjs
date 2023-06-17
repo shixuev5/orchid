@@ -40,9 +40,10 @@ export async function sync(record) {
       data: {
         fields: {
           '编号': record.id,
-          '品种名': record.species,
-          '个体名': record.individual,
-          '全名': record.name,
+          '属': record.genera,
+          '种': record.species,
+          '品种': record.individual,
+          '学名': record.name,
           '标题': record.title,
           '描述': record.description,
           '附件': attachment,
