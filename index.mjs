@@ -109,6 +109,7 @@ while(links.length > 0) {
   });
 
   const species = normalizeGenera(speciesMatch ? speciesMatch[0].trim() : "");
+  const name = normalizeGenera(nameMatch ? nameMatch[0].trim() : "");
 
   const record = {
     id,
@@ -119,7 +120,7 @@ while(links.length > 0) {
       : individualMatch
       ? individualMatch[1].trim()
       : "",
-    name: nameMatch ? nameMatch[0].trim() : "",
+    name,
     title,
     description: $(".ProductExplanation__commentBody")
       .text()
