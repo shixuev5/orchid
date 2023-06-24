@@ -18,10 +18,11 @@ const fetchList = async (cursor) => {
     "https://auctions.yahoo.co.jp/closedsearch/closedsearch",
     {
       params: {
-        p: "洋蘭 C. -sib -phal",
-        auccat: "2084048019",
-        va: "洋蘭 C.",
+        p: "洋蘭 (C. Cattleya) -sib -phal",
+        auccat: "2084207337",
+        va: "洋蘭",
         ve: "sib phal",
+        vo: "C. Cattleya",
         aucminprice: 5000,
         thumb: 1,
         b: cursor,
@@ -97,10 +98,10 @@ while(links.length > 0) {
   const section = $(".Section__tableData");
   const id = section.eq(12).text().trim();
 
-  const title = $(".ProductTitle__text").eq(0).text().trim();
-  const nameMatch = title.match(/C\.?[0-9a-z-.()/''‘’ ]+/i);
+  const title = $(".ProductTitle__text").eq(0).text().replace(/Cattleya\.?/i, 'C.').trim();
+  const nameMatch = title.match(/C\.?[0-9a-z&-.()/×'`´‘’｀ ]+/i);
   const speciesMatch = title.match(/C\.?\s?[a-z]+/i);
-  const individualMatch = title.match(/['`‘’´]([a-z. ]+)['’｀]?/i);
+  const individualMatch = title.match(/['`´‘’｀]([a-z&. ]+)['`´‘’｀]?/i);
   const timesMatch = $(".Count__detail").eq(0).text().match(/(\d+)/);
 
   const images = new Set();
@@ -115,7 +116,7 @@ while(links.length > 0) {
     id,
     genera: judgeGenera(species),
     species,
-    individual: /\s?[xX]\s+/.test(title)
+    individual: /\s?[×xX]\s+/.test(title)
       ? ""
       : individualMatch
       ? individualMatch[1].trim()
@@ -135,7 +136,7 @@ while(links.length > 0) {
       $(".Price__value").eq(0).text().replace(/円.*/, "").replace(",", "").trim()
     ),
     times: Number(timesMatch ? timesMatch[1] : 1),
-    images: Array.from(images),
+    images: Array.from(images).slice(0, 6),
     startTime: new Date(
       section
         .eq(10)
