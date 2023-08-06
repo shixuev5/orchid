@@ -122,7 +122,6 @@ while(links.length > 0) {
       ? individualMatch[1].trim()
       : "",
     name,
-    title,
     description: $(".ProductExplanation__commentBody")
       .text()
       .trim()
@@ -137,13 +136,6 @@ while(links.length > 0) {
     ),
     times: Number(timesMatch ? timesMatch[1] : 1),
     images: Array.from(images).slice(0, 6),
-    startTime: new Date(
-      section
-        .eq(10)
-        .text()
-        .trim()
-        .replace(/（.+）/g, " ")
-    ).getTime(),
     endTime: new Date(
       section
         .eq(11)
