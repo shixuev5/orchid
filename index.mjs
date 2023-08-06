@@ -146,7 +146,12 @@ while(links.length > 0) {
     seller: $(".Seller__name a").text().trim(),
   };
 
-  await sync(record);
+    
+  const res = await sync(record);
+  if (res.code !== 0) {
+    console.log(res);
+    process.exit(1);
+  }
 
   fs.writeFileSync(configFile, String(id));
 }
