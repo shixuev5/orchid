@@ -52,7 +52,7 @@ export async function sync(record) {
           '出售者': record.seller,
           '购买者': '-',
           '出售时间': record.endTime,
-          '拍卖链接': { link: record.link },
+          '链接': { link: record.link },
         },
       },
       path: { app_token: process.env.appToken, table_id: process.env.tableId },
