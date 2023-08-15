@@ -18,11 +18,11 @@ const fetchList = async (cursor) => {
     "https://auctions.yahoo.co.jp/closedsearch/closedsearch",
     {
       params: {
-        p: "洋蘭 (C. Cattleya) -sib -phal",
+        p: "洋蘭 (C. Cattleya カトレア) -sib -phal",
         auccat: "2084207337",
         va: "洋蘭",
         ve: "sib phal",
-        vo: "C. Cattleya",
+        vo: "C. Cattleya カトレア",
         aucminprice: 5000,
         thumb: 1,
         b: cursor,
