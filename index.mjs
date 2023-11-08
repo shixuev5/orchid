@@ -11,6 +11,7 @@ const links = [];
 
 if (fs.existsSync(configFile)) {
   latestID = fs.readFileSync(configFile, "utf-8");
+  console.log('读取到上一次同步 ID 为:' + latestId)
 }
 
 const fetchList = async (cursor) => {
@@ -62,12 +63,14 @@ while (cursor < total) {
         .match(/\s([0-9,]+)件/)[1]
         .replace(",", "")
     );
+    console.log('获取到数据总条数为：' + total);
   }
 
   $(".Product").each(function () {
     const link = $(this).find(".Product__titleLink").attr("href");
     const ID = link.slice(link.lastIndexOf('/') + 1);
     if (ID !== latestID) {
+      console.log('发现新的未处理记录，记录 ID 为：' + ID);
       links.push(link);
     } else {
       cursor = Infinity;
