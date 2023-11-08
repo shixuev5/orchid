@@ -12,6 +12,8 @@ const links = [];
 if (fs.existsSync(configFile)) {
   latestID = fs.readFileSync(configFile, "utf-8");
   console.log('读取到上一次同步 ID 为:' + latestID)
+} else {
+  console.log('不存在配置文件')
 }
 
 const fetchList = async (cursor) => {
