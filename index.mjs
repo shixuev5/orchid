@@ -11,7 +11,7 @@ const links = [];
 
 if (fs.existsSync(configFile)) {
   latestID = fs.readFileSync(configFile, "utf-8");
-  console.log('读取到上一次同步 ID 为:' + latestId)
+  console.log('读取到上一次同步 ID 为:' + latestID)
 }
 
 const fetchList = async (cursor) => {
