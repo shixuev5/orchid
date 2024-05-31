@@ -101,7 +101,7 @@ while(links.length > 0) {
   const $ = load(response.data);
 
   const section = $(".Section__tableData");
-  const id = section.eq(12).text().trim();
+  const id = section.eq(11).text().trim();
 
   const title = $(".ProductTitle__text").eq(0).text().replace(/Cattleya\.?/i, 'C.').trim();
   const nameMatch = title.match(/C\.?[0-9a-z&#-.()/×'`´‘’｀ ]+/i);
@@ -134,23 +134,22 @@ while(links.length > 0) {
       .replace(/\n$/, ""),
     link,
     startPrice: Number(
-      section.eq(9).text().replace(/円.*/, "").replace(",", "").trim()
+      section.eq(8).text().replace(/円.*/, "").replace(",", "").trim()
     ),
     endPrice: Number(
       $(".Price__value").eq(0).text().replace(/円.*/, "").replace(",", "").trim()
-    ),
+    ) + Number($(".Price__postageValue").eq(1).text().replace(/円.*/, "").replace(",", "").trim() || 0),
     times: Number(timesMatch ? timesMatch[1] : 1),
     images: Array.from(images).slice(0, 6),
     endTime: new Date(
       section
-        .eq(11)
+        .eq(10)
         .text()
         .trim()
         .replace(/（.+）/g, " ")
     ).getTime(),
-    seller: $(".Seller__name a").text().trim(),
+    seller: $(".Seller__name a").attr('href').replace('https://auctions.yahoo.co.jp/seller/', ''),
   };
-
     
   const res = await sync(record);
   if (res.code !== 0) {
