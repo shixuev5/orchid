@@ -100,14 +100,13 @@ while(links.length > 0) {
   const response = await http.get(link);
   const $ = load(response.data);
 
-  const section = $(".Section__tableData");
-  const id = section.eq(11).text().trim();
+  const pageData = JSON.parse($("meta[name=next-head-count]").prev().text().replace('var pageData = ', '').replace(/;$/, '')).items;
+  const id = pageData.productID;
 
-  const title = $("#itemTitle h1").text().replace(/Cattleya\.?/i, 'C.').trim();
-  const nameMatch = title.match(/C\.?[0-9a-z&#-.()/×'`´‘’｀ ]+/i);
+  const title = pageData.title.replace(/Cattleya\.?/i, 'C.').trim();
+  const nameMatch = title.match(/C\.?[0-9a-z&#-.()/×'`´‘’“”｀ ]+/i);
   const speciesMatch = title.match(/C\.?\s?[a-z]+/i);
-  const individualMatch = title.match(/['`´‘’｀]([0-9a-z&#. ]+)['`´‘’｀]?/i);
-  const timesMatch = $("#itemStatus li").eq(0).text().match(/(\d+)/);
+  const individualMatch = title.match(/['`´‘’“”｀]([0-9a-z&#. ]+)['`´‘’“”｀]?/i);
 
   const images = new Set();
   $(".slick-track img").each(function () {
@@ -133,20 +132,12 @@ while(links.length > 0) {
       .replace(/^\n/, "")
       .replace(/\n$/, ""),
     link,
-    startPrice: Number(
-      $('#itemPostage').prev().find('dd span').eq(0).text().replace(/円.*/, "").replace(",", "").trim()
-    ),
-    endPrice: Number($('#itemPostage').prev().find('dd span').eq(0).text().replace(/円.*/, "").replace(",", "").trim()),
-    times: Number(timesMatch ? timesMatch[1] : 1),
+    startPrice: Number($('#__NEXT_DATA__').text().match(/"initPrice":(\d+)/)?.[1] ?? 0),
+    endPrice: Number(pageData.price),
+    times: Number(pageData.bids),
     images: Array.from(images).slice(0, 6),
-    endTime: new Date(
-      section
-        .eq(10)
-        .text()
-        .trim()
-        .replace(/（.+）/g, " ")
-    ).getTime(),
-    seller: $("#sellerInfo a").eq(1).attr('href').replace('https://auctions.yahoo.co.jp/jp/show/rating?userID=', ''),
+    endTime: new Date(pageData.endtime).getTime(),
+    seller: $("#sellerInfo a").eq(-3).attr('href').replace('https://auctions.yahoo.co.jp/jp/show/rating?userID=', ''),
   };
     
   const res = await sync(record);
