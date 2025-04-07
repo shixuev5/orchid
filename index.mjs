@@ -103,14 +103,14 @@ while(links.length > 0) {
   const section = $(".Section__tableData");
   const id = section.eq(11).text().trim();
 
-  const title = $(".ProductTitle__text").eq(0).text().replace(/Cattleya\.?/i, 'C.').trim();
+  const title = $("#itemTitle h1").text().replace(/Cattleya\.?/i, 'C.').trim();
   const nameMatch = title.match(/C\.?[0-9a-z&#-.()/×'`´‘’｀ ]+/i);
   const speciesMatch = title.match(/C\.?\s?[a-z]+/i);
   const individualMatch = title.match(/['`´‘’｀]([0-9a-z&#. ]+)['`´‘’｀]?/i);
-  const timesMatch = $(".Count__detail").eq(0).text().match(/(\d+)/);
+  const timesMatch = $("#itemStatus li").eq(0).text().match(/(\d+)/);
 
   const images = new Set();
-  $(".ProductImage__images img").each(function () {
+  $(".slick-track img").each(function () {
     images.add($(this).attr("src"));
   });
 
@@ -127,18 +127,16 @@ while(links.length > 0) {
       ? individualMatch[1].trim()
       : "",
     name,
-    description: $(".ProductExplanation__commentBody")
+    description: $("#description")
       .text()
       .trim()
       .replace(/^\n/, "")
       .replace(/\n$/, ""),
     link,
     startPrice: Number(
-      section.eq(8).text().replace(/円.*/, "").replace(",", "").trim()
+      $('#itemPostage').prev().find('dd span').eq(0).text().replace(/円.*/, "").replace(",", "").trim()
     ),
-    endPrice: Number(
-      $(".Price__value").eq(0).text().replace(/円.*/, "").replace(",", "").trim()
-    ) + Number($(".Price__postageValue").eq(1).text().replace(/円.*/, "").replace(",", "").trim() || 0),
+    endPrice: Number($('#itemPostage').prev().find('dd span').eq(0).text().replace(/円.*/, "").replace(",", "").trim()),
     times: Number(timesMatch ? timesMatch[1] : 1),
     images: Array.from(images).slice(0, 6),
     endTime: new Date(
