@@ -137,7 +137,7 @@ while(links.length > 0) {
     times: Number(pageData.bids),
     images: Array.from(images).slice(0, 6),
     endTime: new Date(pageData.endtime).getTime(),
-    seller: $("#sellerInfo a").eq(-3).attr('href').replace('https://auctions.yahoo.co.jp/jp/show/rating?userID=', ''),
+    seller: $('#__NEXT_DATA__').text().match(/userID=([^"]+?)/)?.[1] ?? '',
   };
     
   const res = await sync(record);
