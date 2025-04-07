@@ -148,7 +148,7 @@ while(links.length > 0) {
         .trim()
         .replace(/（.+）/g, " ")
     ).getTime(),
-    seller: $(".Seller__name a").attr('href').replace('https://auctions.yahoo.co.jp/seller/', ''),
+    seller: $("#sellerInfo a").eq(1).attr('href').replace('https://auctions.yahoo.co.jp/jp/show/rating?userID=', ''),
   };
     
   const res = await sync(record);
