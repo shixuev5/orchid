@@ -103,7 +103,7 @@ while(links.length > 0) {
   const pageData = JSON.parse($("meta[name=next-head-count]").prev().text().replace('var pageData = ', '').replace(/;$/, '')).items;
   const id = pageData.productID;
 
-  const title = pageData.title.replace(/Cattleya\.?/i, 'C.').trim();
+  const title = pageData.productName.replace(/Cattleya\.?/i, 'C.').trim();
   const nameMatch = title.match(/C\.?[0-9a-z&#-.()/×'`´‘’“”｀ ]+/i);
   const speciesMatch = title.match(/C\.?\s?[a-z]+/i);
   const individualMatch = title.match(/['`´‘’“”｀]([0-9a-z&#. ]+)['`´‘’“”｀]?/i);
