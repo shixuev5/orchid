@@ -108,11 +108,12 @@ while(links.length > 0) {
   // 学名
   const nameMatch = title.match(/C\.?[0-9a-zA-Z&#-.()/×'`´‘’“”｀ ]+/i) ?? description.match(/C\.?[0-9a-zA-Z&#-.()/×'`´‘’“”｀ ]+/i);
   const name = normalizeGenera(nameMatch ? nameMatch[0].trim() : "");
-  // 品种
+  // 种
   const speciesMatch = name.match(/C\.?\s?[a-z]+/i);
   const species = normalizeGenera(speciesMatch ? speciesMatch[0].trim() : "");
-  // 个体
+  // 品种
   const individualMatch = name.match(/['`´‘’“”｀]([0-9a-zA-Z&#. ]+)['`´‘’“”｀]?/i);
+  const individual = /\s?[×xX]\s+/.test(name) ? "-" : individualMatch ? individualMatch[1].trim() : "-"
 
   const images = new Set();
   $(".slick-track img").each(function () {
@@ -127,11 +128,7 @@ while(links.length > 0) {
     id,
     genera: judgeGenera(species),
     species,
-    individual: /\s?[×xX]\s+/.test(name)
-      ? ""
-      : individualMatch
-      ? individualMatch[1].trim()
-      : "",
+    individual,
     name,
     description,
     link,
