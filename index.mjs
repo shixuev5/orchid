@@ -119,6 +119,10 @@ while(links.length > 0) {
     images.add($(this).attr("src"));
   });
 
+  // 出售者
+  const sellerInfoLinks = $('#sellerInfo a')
+  const seller = sellerInfoLinks.eq(sellerInfoLinks.length === 4 ? 0 : 1).text()
+
   const record = {
     id,
     genera: judgeGenera(species),
@@ -136,7 +140,7 @@ while(links.length > 0) {
     times: Number(pageData.bids),
     images: Array.from(images).slice(0, 6),
     endTime: new Date(pageData.endtime).getTime(),
-    seller: $('#sellerInfo a').eq(1).text()
+    seller
   };
     
   const res = await sync(record);
