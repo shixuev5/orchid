@@ -106,13 +106,13 @@ while(links.length > 0) {
   const title = pageData.productName.replace(/Cattleya\.?/i, 'C.').trim();
   const description = $("#description").text().trim().replace(/^\n/, "").replace(/\n$/, "");
   // 学名
-  const nameMatch = title.match(/C\.?[0-9a-zA-Z&#-.()/×'`´‘’“”｀ ]+/i) ?? description.match(/C\.?[0-9a-zA-Z&#-.()/×'`´‘’“”｀ ]+/i);
+  const nameMatch = title.match(/C\.?[0-9a-z&#-.()/×'`´‘’“”｀\s]+/i) ?? description.match(/C\.?[0-9a-z&#-.()/×'`´‘’“”｀\s]+/i);
   const name = normalizeGenera(nameMatch ? nameMatch[0].trim() : "");
   // 种
   const speciesMatch = name.match(/C\.?\s?[a-z]+/i);
   const species = normalizeGenera(speciesMatch ? speciesMatch[0].trim() : "");
   // 品种
-  const individualMatch = name.match(/['`´‘’“”｀]([0-9a-zA-Z&#. ]+)['`´‘’“”｀]?/i);
+  const individualMatch = name.match(/['`´‘’“”｀]([0-9a-z&#.\s]+)['`´‘’“”｀]?/i);
   const individual = /\s?[×xX]\s+/.test(name) ? "-" : individualMatch ? individualMatch[1].trim() : "-"
 
   const images = new Set();
@@ -121,8 +121,7 @@ while(links.length > 0) {
   });
 
   // 出售者
-  const sellerInfoLinks = $('#sellerInfo a')
-  const seller = sellerInfoLinks.eq(sellerInfoLinks.length <= 4 ? 0 : 1).text()
+  const seller = $('#__NEXT_DATA__').text().match(/"displayName":"([^"]+)"/)?.[1] ?? ""
 
   const record = {
     id,
