@@ -103,7 +103,7 @@ while(links.length > 0) {
   const pageData = JSON.parse($("meta[name=next-head-count]").prev().text().replace('var pageData = ', '').replace(/;$/, '')).items;
   const id = pageData.productID;
 
-  const title = pageData.productName.replace(/Cattleya\.?/i, 'C.').trim();
+  const title = $('#itemTitle h1').text().replace(/Cattleya\.?/i, 'C.').trim();
   const description = $("#description").text().trim().replace(/^\n/, "").replace(/\n$/, "");
   // 学名
   const nameMatch = title.match(/C\.?[0-9a-z&#-.()/×'`´‘’“”｀\s]+/i) ?? description.match(/C\.?[0-9a-z&#-.()/×'`´‘’“”｀\s]+/i);
