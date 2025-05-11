@@ -104,40 +104,39 @@ while(links.length > 0) {
   const id = pageData.productID;
 
   const title = pageData.productName.replace(/Cattleya\.?/i, 'C.').trim();
-  const nameMatch = title.match(/C\.?[0-9a-z&#-.()/×'`´‘’“”｀ ]+/i);
-  const speciesMatch = title.match(/C\.?\s?[a-z]+/i);
-  const individualMatch = title.match(/['`´‘’“”｀]([0-9a-z&#. ]+)['`´‘’“”｀]?/i);
+  const description = $("#description").text().trim().replace(/^\n/, "").replace(/\n$/, "");
+  // 学名
+  const nameMatch = title.match(/C\.?[0-9a-zA-Z&#-.()/×'`´‘’“”｀ ]+/i) ?? description.match(/C\.?[0-9a-zA-Z&#-.()/×'`´‘’“”｀ ]+/i);
+  const name = normalizeGenera(nameMatch ? nameMatch[0].trim() : "");
+  // 品种
+  const speciesMatch = name.match(/C\.?\s?[a-z]+/i);
+  const species = normalizeGenera(speciesMatch ? speciesMatch[0].trim() : "");
+  // 个体
+  const individualMatch = name.match(/['`´‘’“”｀]([0-9a-zA-Z&#. ]+)['`´‘’“”｀]?/i);
 
   const images = new Set();
   $(".slick-track img").each(function () {
     images.add($(this).attr("src"));
   });
 
-  const species = normalizeGenera(speciesMatch ? speciesMatch[0].trim() : "");
-  const name = normalizeGenera(nameMatch ? nameMatch[0].trim() : "");
-
   const record = {
     id,
     genera: judgeGenera(species),
     species,
-    individual: /\s?[×xX]\s+/.test(title)
+    individual: /\s?[×xX]\s+/.test(name)
       ? ""
       : individualMatch
       ? individualMatch[1].trim()
       : "",
     name,
-    description: $("#description")
-      .text()
-      .trim()
-      .replace(/^\n/, "")
-      .replace(/\n$/, ""),
+    description,
     link,
     startPrice: Number($('#__NEXT_DATA__').text().match(/"initPrice":(\d+)/)?.[1] ?? 0),
     endPrice: Number(pageData.price),
     times: Number(pageData.bids),
     images: Array.from(images).slice(0, 6),
     endTime: new Date(pageData.endtime).getTime(),
-    seller: $('#__NEXT_DATA__').text().match(/userID=([^"]+)/)?.[1] ?? '',
+    seller: $('#sellerInfo a').eq(1).text()
   };
     
   const res = await sync(record);
