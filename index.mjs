@@ -122,7 +122,7 @@ while(links.length > 0) {
 
   // 出售者
   const sellerInfoLinks = $('#sellerInfo a')
-  const seller = sellerInfoLinks.eq(sellerInfoLinks.length === 4 ? 0 : 1).text()
+  const seller = sellerInfoLinks.eq(sellerInfoLinks.length <= 4 ? 0 : 1).text()
 
   const record = {
     id,
