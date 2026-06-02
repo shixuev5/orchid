@@ -4,8 +4,8 @@ import { http } from "./http.mjs";
 import { sync } from "./lark.mjs";
 
 const configFile = '.config';
+const PAGE_SIZE = 100;
 let cursor = 1;
-let total = Infinity;
 let latestID = 0;
 const links = [];
 
@@ -37,6 +37,58 @@ const fetchList = async (cursor) => {
   return load(response.data);
 };
 
+function getNextData($) {
+  const data = $('#__NEXT_DATA__').text();
+  if (!data) {
+    throw new Error('页面缺少 __NEXT_DATA__，无法解析 Yahoo 新页面数据。');
+  }
+
+  return JSON.parse(data);
+}
+
+function getProductLinks($) {
+  const data = getNextData($);
+  const items = data.props?.pageProps?.initialState?.search?.items?.listing?.items;
+
+  if (!Array.isArray(items)) {
+    throw new Error('页面 __NEXT_DATA__ 中缺少 search.items.listing.items，无法解析列表数据。');
+  }
+
+  return items
+    .map((item) => item.auctionId)
+    .filter(Boolean)
+    .map((id) => `https://auctions.yahoo.co.jp/jp/auction/${id}`);
+}
+
+function getProductID(link) {
+  const url = new URL(link);
+  const segments = url.pathname.split("/").filter(Boolean);
+  return segments[segments.length - 1] ?? "";
+}
+
+function getDetailItem($) {
+  const data = getNextData($);
+  const item = data.props?.pageProps?.initialState?.item?.detail?.item;
+
+  if (!item?.auctionId) {
+    throw new Error('页面 __NEXT_DATA__ 中缺少 item.detail.item，无法解析详情数据。');
+  }
+
+  return item;
+}
+
+function getDescription(item) {
+  if (item.descriptionHtml) {
+    return load(item.descriptionHtml).text().trim();
+  }
+
+  if (Array.isArray(item.description)) {
+    return item.description.join('\n').trim();
+  }
+
+  return String(item.description ?? '').trim();
+}
+
 // 返回 C. xxx
 function normalizeGenera(str) {
   return str.replace(/^([CcPpLl])\.?\s*(.+)$/, (_, $1, $2) => `${$1.toUpperCase()}. ${$2}`);
@@ -55,32 +107,42 @@ function judgeGenera(str) {
   return genera;
 }
 
-while (cursor < total) {
+const seenProductIDs = new Set();
+let reachedLatestID = false;
+
+while (true) {
   const $ = await fetchList(cursor);
+  const pageLinks = [];
 
-  if (total === Infinity) {
-    total = Number(
-      $(".SearchMode__title")
-        .text()
-        .match(/\s([0-9,]+)件/)[1]
-        .replace(",", "")
-    );
-    console.log('获取到数据总条数为：' + total);
-  }
+  for (const link of getProductLinks($)) {
+    const ID = getProductID(link);
+    if (!ID || seenProductIDs.has(ID)) {
+      continue;
+    }
 
-  $(".Product").each(function () {
-    const link = $(this).find(".Product__titleLink").attr("href");
-    const ID = link.slice(link.lastIndexOf('/') + 1);
+    seenProductIDs.add(ID);
     if (ID !== latestID) {
       console.log('发现新的未处理记录，记录 ID 为：' + ID);
-      links.push(link);
+      pageLinks.push(link);
     } else {
-      cursor = Infinity;
-      return false;
+      console.log('已找到上一次同步记录，停止读取列表。');
+      reachedLatestID = true;
+      break;
     }
-  });
+  }
 
-  cursor += 100;
+  links.push(...pageLinks);
+
+  if (reachedLatestID) {
+    break;
+  }
+
+  if (pageLinks.length === 0) {
+    console.log(`第 ${cursor} 条开始的列表页没有发现新的商品链接，停止读取列表。`);
+    break;
+  }
+
+  cursor += PAGE_SIZE;
 }
 
 const totalLinks = links.length;
@@ -100,11 +162,11 @@ while(links.length > 0) {
   const response = await http.get(link);
   const $ = load(response.data);
 
-  const pageData = JSON.parse($("meta[name=next-head-count]").prev().text().replace('var pageData = ', '').replace(/;$/, '')).items;
-  const id = pageData.productID;
+  const item = getDetailItem($);
+  const id = item.auctionId;
 
-  const title = $('#itemTitle h1').text().replace(/Cattleya\.?/i, 'C.').trim();
-  const description = $("#description").text().trim().replace(/^\n/, "").replace(/\n$/, "");
+  const title = item.title.replace(/Cattleya\.?/i, 'C.').trim();
+  const description = getDescription(item);
   // 学名
   const nameMatch = title.match(/C\.?[0-9a-z&#-.()/×'`´‘’“”｀\s]+/i) ?? description.match(/C\.?[0-9a-z&#-.()/×'`´‘’“”｀\s]+/i);
   const name = normalizeGenera(nameMatch ? nameMatch[0].trim() : "");
@@ -115,13 +177,10 @@ while(links.length > 0) {
   const individualMatch = name.match(/['`´‘’“”｀]([0-9a-z&#.\s]+)['`´‘’“”｀]?/i);
   const individual = /\s?[×xX]\s+/.test(name) ? "-" : individualMatch ? individualMatch[1].trim() : "-"
 
-  const images = new Set();
-  $(".slick-track img").each(function () {
-    images.add($(this).attr("src"));
-  });
+  const images = new Set(item.img?.map((image) => image.image).filter(Boolean) ?? []);
 
   // 出售者
-  const seller = $('#__NEXT_DATA__').text().match(/"displayName":"([^"]+)"/)?.[1] ?? ""
+  const seller = item.seller?.displayName ?? ""
 
   const record = {
     id,
@@ -131,11 +190,11 @@ while(links.length > 0) {
     name,
     description,
     link,
-    startPrice: Number($('#__NEXT_DATA__').text().match(/"initPrice":(\d+)/)?.[1] ?? 0),
-    endPrice: Number(pageData.price),
-    times: Number(pageData.bids),
+    startPrice: Number(item.initPrice ?? 0),
+    endPrice: Number(item.price ?? 0),
+    times: Number(item.bids ?? 0),
     images: Array.from(images).slice(0, 6),
-    endTime: new Date(pageData.endtime).getTime(),
+    endTime: new Date(item.endTime).getTime(),
     seller
   };
     

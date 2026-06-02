@@ -1,7 +1,7 @@
-import { Axios } from 'axios';
+import axios from 'axios';
 import axiosRetry from 'axios-retry';
 
-const http = new Axios({});
+const http = axios.create({});
 axiosRetry(http, { retries: 3 });
 
 export {
