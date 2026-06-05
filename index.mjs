@@ -198,7 +198,15 @@ while(links.length > 0) {
     seller
   };
     
-  const res = await sync(record);
+  let res;
+  try {
+    res = await sync(record);
+  } catch (error) {
+    console.error(`Sync failed for ${id} (${link})`);
+    console.error(error?.response?.data ?? error?.response?.status ?? error?.message ?? error);
+    process.exit(1);
+  }
+
   if (res.code !== 0) {
     console.log(res);
     process.exit(1);
